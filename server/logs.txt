@@ -1,0 +1,33 @@
+Successfully connected to the development Database!
+Server is listening on port 5000....
+Successfully connected to the development Database!
+Server is listening on port 5000....
+Successfully connected to the development Database!
+Server is listening on port 5000....
+Successfully connected to the development Database!
+Server is listening on port 5000....
+[0mGET / [32m200[0m 13.956 ms - 651[0m
+[0mGET /static/css/main.249546cb.css [32m200[0m 4.482 ms - 8755[0m
+[0mGET /static/js/main.431f0066.js [32m200[0m 5.338 ms - 240374[0m
+[0mGET /static/media/favicon.67ade1ced60a96e9e72f.ico [32m200[0m 4.947 ms - 15406[0m
+[0mGET /manifest.json [36m304[0m 1.851 ms - -[0m
+[0mGET /favicon.ico [36m304[0m 2.777 ms - -[0m
+[0mGET /logo192.png [36m304[0m 1.327 ms - -[0m
+[0mGET /static/media/main.dbf022ed0238d7ca3b41d6ccc6acd5c6.svg [32m200[0m 9.168 ms - 12338[0m
+[0mPOST /api/v1/users/login [32m200[0m 559.873 ms - 362[0m
+[0mGET /static/media/main.dbf022ed0238d7ca3b41d6ccc6acd5c6.svg [36m304[0m 5.407 ms - -[0m
+[0mPOST /api/v1/users/login [32m200[0m 499.337 ms - 362[0m
+[0mGET /profile [32m200[0m 16.455 ms - 651[0m
+[0mGET /static/css/main.249546cb.css [36m304[0m 1.319 ms - -[0m
+[0mGET /static/js/main.431f0066.js [36m304[0m 2.889 ms - -[0m
+[0mGET /static/media/favicon.67ade1ced60a96e9e72f.ico [36m304[0m 1.012 ms - -[0m
+[0mGET /favicon.ico [36m304[0m 1.666 ms - -[0m
+[0mGET /manifest.json [36m304[0m 1.092 ms - -[0m
+[0mGET /logo192.png [36m304[0m 1.317 ms - -[0m
+[0mGET /profile [36m304[0m 1.823 ms - -[0m
+[0mGET /static/js/main.431f0066.js [36m304[0m 1.085 ms - -[0m
+[0mGET /static/css/main.249546cb.css [36m304[0m 0.947 ms - -[0m
+[0mGET /static/media/favicon.67ade1ced60a96e9e72f.ico [36m304[0m 1.357 ms - -[0m
+[0mGET /favicon.ico [36m304[0m 2.301 ms - -[0m
+[0mGET /manifest.json [36m304[0m 1.204 ms - -[0m
+[0mGET /logo192.png [36m304[0m 1.169 ms - -[0m

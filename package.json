@@ -1,0 +1,23 @@
+{
+  "name": "job_app",
+  "version": "1.0.0",
+  "description": "fullstack job seeking application built using MERN technologies",
+  "main": "server.js",
+  "scripts": {
+    "client": "npm start --prefix client",
+    "server": "npm run watch --prefix server",
+    "watch": "concurrently \"npm run client\" \"npm run server\"",
+    "install-client": "npm install --prefix client",
+    "install-server": "npm install --prefix server",
+    "install": "npm run install-client && npm run install-server",
+    "test": "npm run test --prefix client && npm run test --prefix server",
+    "deploy": "npm run build --prefix client && npm start --prefix server",
+    "deploy-cluster":"npm run build --prefix client && npm run cluster --prefix server",
+    "deploy-watch": "npm run build --prefix client && npm run watch --prefix server"
+  },
+  "author": "Mohammad Rumman",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^7.3.0"
+  }
+}

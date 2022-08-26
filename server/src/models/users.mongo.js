@@ -1,0 +1,84 @@
+const mongoose = require("mongoose");
+const validator = require("validator");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, "Please tell us your name!"],
+    trim: true,
+  },
+
+  lastName: {
+    type: String,
+    trim: true,
+    default: "Last name",
+  },
+
+  email: {
+    type: String,
+    required: [true, "Please provide your email"],
+    unique: true,
+    lowercase: true,
+    validate: [validator.isEmail, "Please provide valid email"],
+  },
+  photo: String,
+  password: {
+    type: String,
+    minlength: [8, "Password must be at least 8 characters"],
+    select: false,
+  },
+  passwordConfirm: {
+    type: String,
+    //This only runs in save and create
+    validate: {
+      validator: function (el) {
+        return el === this.password;
+      },
+      message: "Passwords are not the same!",
+    },
+  },
+
+  location: {
+    type: String,
+    trim: true,
+    default: "my city",
+  },
+  role: {
+    type: String,
+    default: "user",
+    select: false,
+  },
+  isActive: {
+    type: Boolean,
+    default: "true",
+    select: false,
+  },
+  photo: String,
+  userNumber: Number,
+});
+
+userSchema.pre("save", async function (next) {
+  //run this if password modified
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+  this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.methods.createJWT = async function () {
+  return await jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+module.exports = mongoose.model("User", userSchema);
