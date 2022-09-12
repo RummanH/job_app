@@ -11,6 +11,8 @@ node_modules
 
 # production
 server/public
+server/logs.txt
+
 
 # misc
 .env

@@ -15,7 +15,7 @@ const Profile = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name || !lastName || !email || !location) {
-      displayAlert();
+      displayAlert({ type: "danger", text: "Please provide all values!" });
       return;
     }
     updateUser({ name, email, lastName, location });

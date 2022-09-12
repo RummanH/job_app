@@ -1,76 +1,47 @@
 import {
-  SHOW_ALERT,
+  DISPLAY_ALERT,
   CLEAR_ALERT,
-  REGISTER_USER_BEGIN,
   REGISTER_USER_SUCCESS,
-  REGISTER_USER_ERROR,
-  LOGIN_USER_BEGIN,
   LOGIN_USER_SUCCESS,
-  LOGIN_USER_ERROR,
   LOGOUT_USER,
-  UPDATE_USER_BEGIN,
   UPDATE_USER_SUCCESS,
-  UPDATE_USER_ERROR,
   TOGGLE_SIDEBAR,
+  CHANGE_PASSWORD_SUCCESS,
+  IS_LOADING,
 } from "./actions";
 import { initialState } from "./appContext";
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case SHOW_ALERT:
+    case DISPLAY_ALERT:
       return {
         ...state,
         showAlert: true,
-        alertType: "danger",
-        alertText: "Please provide all values!",
+        alertType: action.payload.type,
+        alertText: action.payload.text,
       };
     case CLEAR_ALERT:
       return { ...state, showAlert: false, alertType: "", alertText: "" };
 
-    case REGISTER_USER_BEGIN:
-      return { ...state, isLoading: false };
+    case IS_LOADING:
+      return { ...state, isLoading: action.payload };
+
     case REGISTER_USER_SUCCESS:
       return {
         ...state,
-        isLoading: false,
         token: action.payload.token,
         user: action.payload.user,
         userLocation: action.payload.user.location,
         jobLocation: action.payload.user.location,
-        showAlert: true,
-        alertType: "success",
-        alertText: "Successfully signup redirecting...",
-      };
-    case REGISTER_USER_ERROR:
-      return {
-        ...state,
-        isLoading: false,
-        showAlert: true,
-        alertType: "danger",
-        alertText: action.payload,
       };
 
-    case LOGIN_USER_BEGIN:
-      return { ...state, isLoading: false };
     case LOGIN_USER_SUCCESS:
       return {
         ...state,
-        isLoading: false,
         token: action.payload.token,
         user: action.payload.user,
         userLocation: action.payload.user.location,
         jobLocation: action.payload.user.location,
-        showAlert: true,
-        alertType: "success",
-        alertText: "Successfully Login redirecting...",
-      };
-    case LOGIN_USER_ERROR:
-      return {
-        ...state,
-        isLoading: false,
-        showAlert: true,
-        alertType: "danger",
-        alertText: action.payload,
       };
 
     case LOGOUT_USER:
@@ -82,26 +53,19 @@ const reducer = (state, action) => {
         userLocation: "",
       };
 
-    case UPDATE_USER_BEGIN:
-      return { ...state, isLoading: true };
     case UPDATE_USER_SUCCESS:
       return {
         ...state,
-        isLoading: false,
         user: action.payload.user,
         userLocation: action.payload.user.location,
         jobLocation: action.payload.user.location,
-        showAlert: true,
-        alertType: "success",
-        alertText: "Profile Updated Successfully!",
       };
-    case UPDATE_USER_ERROR:
+
+    case CHANGE_PASSWORD_SUCCESS:
       return {
         ...state,
-        showAlert: true,
-        alertType: "danger",
         isLoading: false,
-        alertText: action.payload,
+        token: action.payload.token,
       };
 
     case TOGGLE_SIDEBAR:

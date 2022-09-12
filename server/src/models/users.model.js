@@ -20,14 +20,14 @@ async function saveUser(user) {
   return createdUser;
 }
 
-async function updateMe(user, id) {
+async function updateMe(id, user) {
   return await users.findByIdAndUpdate(id, user, {
     new: true,
     runValidators: true,
   });
 }
 
-async function getOneUser(userId) {
+async function getOneUserById(userId) {
   return await users.findById(userId).select("+password");
 }
 
@@ -35,7 +35,14 @@ async function getAllUser() {
   return await users.find({}, { __v: 0 });
 }
 
-async function existUser(email) {
+async function getOneUserByEmail(email) {
   return await users.findOne({ email }).select("+password");
 }
-module.exports = { saveUser, getOneUser, getAllUser, existUser, updateMe };
+
+module.exports = {
+  saveUser,
+  getOneUserById,
+  getAllUser,
+  getOneUserByEmail,
+  updateMe,
+};

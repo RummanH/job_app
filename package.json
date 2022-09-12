@@ -12,7 +12,7 @@
     "install": "npm run install-client && npm run install-server",
     "test": "npm run test --prefix client && npm run test --prefix server",
     "deploy": "npm run build --prefix client && npm start --prefix server",
-    "deploy-cluster":"npm run build --prefix client && npm run cluster --prefix server",
+    "deploy-cluster": "npm run build --prefix client && npm run cluster --prefix server",
     "deploy-watch": "npm run build --prefix client && npm run watch --prefix server"
   },
   "author": "Mohammad Rumman",

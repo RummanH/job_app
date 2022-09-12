@@ -3,10 +3,11 @@ const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
 
 const AppError = require("../../services/AppError");
-const { getOneUser } = require("../../models/users.model");
+const { getOneUserById } = require("../../models/users.model");
 
 async function httpProtect(req, res, next) {
   let token;
+
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
@@ -20,9 +21,11 @@ async function httpProtect(req, res, next) {
     );
   }
 
+  console.log(token);
+
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-  const currentUser = await getOneUser(decoded.id);
+  const currentUser = await getOneUserById(decoded.id);
   if (!currentUser) {
     return next(
       new AppError("Token user belong to this token does no longer exist!", 401)

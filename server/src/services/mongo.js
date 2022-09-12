@@ -3,7 +3,7 @@ require("dotenv").config();
 
 let CONNECTION_URL;
 if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
-  CONNECTION_URL = process.env.MONGO_URL;
+  CONNECTION_URL = process.env.MONGO_URL_DEVELOPMENT;
 } else if (process.env.NODE_ENV === "production") {
   CONNECTION_URL = process.env.MONGO_URL_PRODUCTION;
 }

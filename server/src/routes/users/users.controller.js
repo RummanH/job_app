@@ -2,11 +2,23 @@ const AppError = require("../../services/AppError");
 
 const {
   saveUser,
-  getOneUser,
+  getOneUserById,
   getAllUser,
-  existUser,
+  getOneUserByEmail,
   updateMe,
 } = require("../../models/users.model");
+
+function sendCookie(token, res) {
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    // secure: true,
+    httpOnly: true,
+  };
+
+  res.cookie("token", token, cookieOptions);
+}
 
 function bodyFilter(candidateObj, ...allowed) {
   const filtered = {};
@@ -25,12 +37,14 @@ async function httpSignupUser(req, res, next) {
     return next(new AppError("Please provide all values!", 400));
   }
 
-  if (await existUser(email)) {
+  if (await getOneUserByEmail(email)) {
     return next(new AppError("User already exist!", 400));
   }
 
   const user = await saveUser({ name, email, password, passwordConfirm });
   const token = await user.createJWT();
+
+  sendCookie(token, res);
 
   return res.status(201).json({
     status: "success",
@@ -47,14 +61,16 @@ async function httpLoginUser(req, res, next) {
     return next(new AppError("Please provide email and password!", 400));
   }
 
-  const user = await existUser(email);
+  const user = await getOneUserByEmail(email);
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError("Incorrect email or password", 401));
   }
 
   const token = await user.createJWT();
-  user.password = undefined;
 
+  sendCookie(token, res);
+
+  user.password = undefined;
   return res.status(200).json({
     status: "success",
     token,
@@ -71,7 +87,7 @@ async function httpUpdateMe(req, res, next) {
   if (password || passwordConfirm) {
     return next(
       new AppError(
-        "This route is not for password update. please use updateMyPassword",
+        "This route is not for password update. please use /updateMyPassword",
         400
       )
     );
@@ -89,7 +105,7 @@ async function httpUpdateMe(req, res, next) {
     "location"
   );
 
-  const updatedMe = await updateMe(filteredBody, req.user.id);
+  const updatedMe = await updateMe(req.user.id, filteredBody);
 
   res.status(200).json({
     status: "success",
@@ -109,7 +125,7 @@ async function httpUpdateUser(req, res, next) {
 }
 
 async function httpGetOneUser(req, res, next) {
-  const user = await getOneUser(req.params.id, next);
+  const user = await getOneUserById(req.params.id, next);
 
   if (!user) {
     return next(new AppError("No user found!", 404));

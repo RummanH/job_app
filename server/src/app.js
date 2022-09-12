@@ -3,6 +3,7 @@ const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
 
 const apiV1Router = require("./routes/api_v1");
 const globalErrorHandler = require("./services/errorHandler");
@@ -13,6 +14,7 @@ if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, "..", "public")));
 

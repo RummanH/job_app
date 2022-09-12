@@ -1,6 +1,10 @@
 import React, { createContext, useReducer, useContext } from "react";
+import { useDispatch } from "react-redux";
 
 import axios from "axios";
+
+import { clearAll } from "../redux-store/features/jobInputSlice";
+import { clearJobs } from "../redux-store/features/jobsSlice";
 
 import {
   addUserToLocalStorage,
@@ -8,19 +12,15 @@ import {
 } from "../services/localStorage";
 
 import {
-  SHOW_ALERT,
   CLEAR_ALERT,
-  REGISTER_USER_BEGIN,
   REGISTER_USER_SUCCESS,
-  REGISTER_USER_ERROR,
-  LOGIN_USER_BEGIN,
   LOGIN_USER_SUCCESS,
-  LOGIN_USER_ERROR,
   LOGOUT_USER,
-  UPDATE_USER_BEGIN,
   UPDATE_USER_SUCCESS,
-  UPDATE_USER_ERROR,
   TOGGLE_SIDEBAR,
+  CHANGE_PASSWORD_SUCCESS,
+  DISPLAY_ALERT,
+  IS_LOADING,
 } from "./actions";
 
 import reducers from "./reducers";
@@ -47,6 +47,8 @@ const initialState = {
 const AppContext = createContext();
 const AppProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducers, initialState);
+  const reduxDispatch = useDispatch();
+
   // axios.defaults.headers.common["Authorization"] = `Bearer ${state.token}`;
 
   const authFetch = axios.create({
@@ -69,15 +71,15 @@ const AppProvider = ({ children }) => {
     },
     (err) => {
       if (err.response.status === 401) {
-        logoutUser();
+        // logoutUser();
       }
 
       return Promise.reject(err);
     }
   );
 
-  const displayAlert = () => {
-    dispatch({ type: SHOW_ALERT });
+  const displayAlert = (payload) => {
+    dispatch({ type: DISPLAY_ALERT, payload });
     clearAlert();
   };
 
@@ -87,8 +89,12 @@ const AppProvider = ({ children }) => {
     }, 1500);
   };
 
+  const isLoading = (status) => {
+    dispatch({ type: IS_LOADING, payload: status });
+  };
+
   const registerUser = async (currentUser) => {
-    dispatch({ type: REGISTER_USER_BEGIN });
+    isLoading(true);
     try {
       const { data } = await axios.post(
         `${URL}/api/v1/users/signup`,
@@ -97,23 +103,27 @@ const AppProvider = ({ children }) => {
 
       const user = data.data.user;
       const token = data.token;
-      addUserToLocalStorage({ user, token });
-
       dispatch({
         type: REGISTER_USER_SUCCESS,
         payload: { token, user },
       });
+      addUserToLocalStorage({ user, token });
+      displayAlert({
+        type: "success",
+        text: "Signup successful redirecting...",
+      });
+      isLoading(false);
     } catch (err) {
-      dispatch({
-        type: REGISTER_USER_ERROR,
-        payload: err.response.data.message,
+      isLoading(false);
+      displayAlert({
+        type: "danger",
+        text: err.response.data.message,
       });
     }
-    clearAlert();
   };
 
   const loginUser = async (currentUser) => {
-    dispatch({ type: LOGIN_USER_BEGIN });
+    isLoading(true);
     try {
       const { data } = await axios.post(
         `${URL}/api/v1/users/login`,
@@ -122,26 +132,31 @@ const AppProvider = ({ children }) => {
 
       const token = data.token;
       const user = data.data.user;
-      addUserToLocalStorage({ user, token });
-
       dispatch({ type: LOGIN_USER_SUCCESS, payload: { token, user } });
+      addUserToLocalStorage({ user, token });
+      displayAlert({
+        type: "success",
+        text: "login successful...",
+      });
+      isLoading(false);
     } catch (err) {
-      dispatch({
-        type: LOGIN_USER_ERROR,
-        payload: err.response.data.message,
+      isLoading(false);
+      displayAlert({
+        type: "danger",
+        text: err.response.data.message,
       });
     }
-
-    clearAlert();
   };
 
   const logoutUser = () => {
     dispatch({ type: LOGOUT_USER });
     removeUserToLocalStorage();
+    reduxDispatch(clearAll());
+    reduxDispatch(clearJobs());
   };
 
   const updateUser = async (currentUser) => {
-    dispatch({ type: UPDATE_USER_BEGIN });
+    isLoading(true);
     try {
       const { data } = await authFetch.patch(
         "/api/v1/users/updateMe",
@@ -150,16 +165,30 @@ const AppProvider = ({ children }) => {
       const user = data.data.user;
       dispatch({ type: UPDATE_USER_SUCCESS, payload: { user } });
       addUserToLocalStorage({ user });
+      displayAlert({ type: "success", text: "Profile updated" });
+      isLoading(false);
     } catch (err) {
-      if (err.response.data.status !== 401) {
-        dispatch({
-          type: UPDATE_USER_ERROR,
-          payload: err.response.data.message,
-        });
-      }
+      isLoading(false);
+      displayAlert({ type: "danger", text: err.response.data.message });
     }
+  };
 
-    clearAlert();
+  const changePassword = async (currentUser) => {
+    isLoading(true);
+    try {
+      const { data } = await authFetch.patch(
+        "/api/v1/users/updateMyPassword",
+        currentUser
+      );
+      const { token } = data;
+      dispatch({ type: CHANGE_PASSWORD_SUCCESS, payload: { token } });
+      addUserToLocalStorage({ token });
+      displayAlert({ type: "success", text: "Password changed." });
+      isLoading(false);
+    } catch (err) {
+      isLoading(false);
+      displayAlert({ type: "danger", text: err.response.data.message });
+    }
   };
 
   const toggleSideBar = () => {
@@ -176,6 +205,7 @@ const AppProvider = ({ children }) => {
         toggleSideBar,
         logoutUser,
         updateUser,
+        changePassword,
       }}
     >
       {children}

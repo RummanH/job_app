@@ -1,6 +1,8 @@
 const express = require("express");
 const catchAsync = require("../../services/catchAsync");
 const { httpProtect, httpUpdatePassword } = require("./auth.controller");
+const jobsRouter = require("../jobs/jobs.router");
+
 const {
   httpSignupUser,
   httpLoginUser,
@@ -11,6 +13,8 @@ const {
 } = require("./users.controller");
 
 const router = express.Router();
+
+router.use("/:userId/jobs", jobsRouter);
 
 //Not RESTFul
 router.post("/signup", catchAsync(httpSignupUser));

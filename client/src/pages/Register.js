@@ -22,7 +22,9 @@ const Register = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/");
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
     }
   }, [user, navigate]);
   const toggleMember = () => {
@@ -46,7 +48,7 @@ const Register = () => {
       (!isMember && !name) ||
       (!isMember && !passwordConfirm)
     ) {
-      displayAlert();
+      displayAlert({ type: "danger", text: "Please provide all values!" });
       return;
     }
     if (isMember) {
