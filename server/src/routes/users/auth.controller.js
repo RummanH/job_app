@@ -21,8 +21,6 @@ async function httpProtect(req, res, next) {
     );
   }
 
-  console.log(token);
-
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   const currentUser = await getOneUserById(decoded.id);
@@ -32,9 +30,27 @@ async function httpProtect(req, res, next) {
     );
   }
 
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError("User recently changed password! Please login again", 401)
+    );
+  }
+
   currentUser.password = undefined;
   req.user = currentUser;
   next();
+}
+
+function httpRestrictTo(...roles) {
+  return (req, res, next) => {
+    console.log(req.user);
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError("You do not have permission to perform this action", 403)
+      );
+    }
+    next();
+  };
 }
 
 async function httpUpdatePassword(req, res, next) {
@@ -48,7 +64,7 @@ async function httpUpdatePassword(req, res, next) {
     );
   }
 
-  const user = await getOneUser(req.user.id);
+  const user = await getOneUserById(req.user.id);
 
   if (!(await user.correctPassword(currentPassword, user.password))) {
     return next(new AppError("Incorrect current password!", 401));
@@ -60,11 +76,11 @@ async function httpUpdatePassword(req, res, next) {
   const token = await user.createJWT();
 
   user.password = undefined;
-  res.status(200).json({
+  return res.status(200).json({
     status: "success",
     token,
     data: { user },
   });
 }
 
-module.exports = { httpProtect, httpUpdatePassword };
+module.exports = { httpProtect, httpRestrictTo, httpUpdatePassword };

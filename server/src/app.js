@@ -2,6 +2,7 @@ const path = require("path");
 
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 
@@ -9,6 +10,7 @@ const apiV1Router = require("./routes/api_v1");
 const globalErrorHandler = require("./services/errorHandler");
 
 const app = express();
+app.use(helmet());
 app.use(cors());
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));

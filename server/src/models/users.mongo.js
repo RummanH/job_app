@@ -48,12 +48,10 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     default: "user",
-    select: false,
   },
   isActive: {
     type: Boolean,
     default: "true",
-    select: false,
   },
   photo: String,
   userNumber: Number,
@@ -86,6 +84,15 @@ userSchema.methods.correctPassword = async function (
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTime) {
+  if (this.passwordChangedAt) {
+    const changedTime = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+    return JWTTime < changedTime;
+  }
+
+  return false;
 };
 
 module.exports = mongoose.model("User", userSchema);

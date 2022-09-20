@@ -1,25 +1,33 @@
-const express = require("express");
-const catchAsync = require("../../services/catchAsync");
-const { httpProtect, httpUpdatePassword } = require("./auth.controller");
+const { Router } = require("express");
+
 const jobsRouter = require("../jobs/jobs.router");
+const catchAsync = require("../../services/catchAsync");
+const {
+  httpProtect,
+  httpRestrictTo,
+  httpUpdatePassword,
+} = require("./auth.controller");
 
 const {
   httpSignupUser,
   httpLoginUser,
-  httpUpdateUser,
+  httpUpdateMe,
   httpGetOneUser,
   httpGetAllUsers,
-  httpUpdateMe,
+  httpUpdateUser,
 } = require("./users.controller");
 
-const router = express.Router();
+const router = Router();
 
+//merging jobsRouter if any
 router.use("/:userId/jobs", jobsRouter);
 
-//Not RESTFul
+//Not RESTFul for all user
 router.post("/signup", catchAsync(httpSignupUser));
 router.post("/login", catchAsync(httpLoginUser));
-router.patch("/update", catchAsync(httpProtect), catchAsync(httpUpdateUser));
+
+// from this point all protected
+router.use(catchAsync(httpProtect));
 
 router.patch("/updateMe", catchAsync(httpProtect), catchAsync(httpUpdateMe));
 router.patch(
@@ -28,8 +36,14 @@ router.patch(
   catchAsync(httpUpdatePassword)
 );
 
-//RESTFul
+//Authorized to admin
+router.use(httpRestrictTo("admin"));
+
+//restFul
 router.route("/").get(catchAsync(httpGetAllUsers));
-router.route("/:id").get(catchAsync(httpGetOneUser));
+router
+  .route("/:id")
+  .get(catchAsync(httpGetOneUser))
+  .patch(catchAsync(httpUpdateUser));
 
 module.exports = router;

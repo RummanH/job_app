@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import Wrapper from "../../assets/wrappers/DashboardFormPage";
 import { useAppContext } from "../../context/appContext";
 import { Alert, FormRow } from "../../components";
+import { useNavigate } from "react-router-dom";
 
 const initialState = { currentPassword: "", password: "", passwordConfirm: "" };
 
 const Setting = () => {
+  const navigate = useNavigate();
   const { user, displayAlert, showAlert, changePassword, isLoading } =
     useAppContext();
 
@@ -20,7 +22,7 @@ const Setting = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!currentPassword || !password || !passwordConfirm) {
-      displayAlert();
+      displayAlert({ type: "danger", text: "Please provide all values!" });
       return;
     }
     const changed = await changePassword({
@@ -31,6 +33,7 @@ const Setting = () => {
 
     if (changed) {
       setInputState(initialState);
+      navigate("/");
     }
   };
   return (

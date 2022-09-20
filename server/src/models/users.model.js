@@ -14,9 +14,6 @@ async function saveUser(user) {
   const userNumber = (await getLatestUserNumber()) + 1;
   user.userNumber = userNumber;
   const createdUser = await users.create(user);
-  createdUser.password = undefined;
-  createdUser.role = undefined;
-  createdUser.isActive = undefined;
   return createdUser;
 }
 

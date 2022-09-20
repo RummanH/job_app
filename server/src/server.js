@@ -1,4 +1,6 @@
-const http = require("http");
+const https = require("https");
+const fs = require("fs");
+const path = require("path");
 require("dotenv").config();
 
 process.on("uncaughtException", (err) => {
@@ -10,7 +12,13 @@ process.on("uncaughtException", (err) => {
 const { mongoConnect } = require("./services/mongo");
 
 const app = require("./app");
-const server = http.createServer(app);
+const server = https.createServer(
+  {
+    key: fs.readFileSync(path.join(__dirname, "..", "key.pem")),
+    cert: fs.readFileSync(path.join(__dirname, "..", "cert.pem")),
+  },
+  app
+);
 
 const PORT = process.env.PORT || 5000;
 (async () => {

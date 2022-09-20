@@ -25,7 +25,7 @@ import {
 
 import reducers from "./reducers";
 
-const URL = "http://localhost:5000";
+const URL = "https://localhost:5000";
 
 const loggedUser = localStorage.getItem("user")
   ? JSON.parse(localStorage.getItem("user"))
@@ -174,6 +174,7 @@ const AppProvider = ({ children }) => {
   };
 
   const changePassword = async (currentUser) => {
+    console.log("hello");
     isLoading(true);
     try {
       const { data } = await authFetch.patch(
@@ -185,8 +186,10 @@ const AppProvider = ({ children }) => {
       addUserToLocalStorage({ token });
       displayAlert({ type: "success", text: "Password changed." });
       isLoading(false);
+      return true;
     } catch (err) {
       isLoading(false);
+      console.log("hi");
       displayAlert({ type: "danger", text: err.response.data.message });
     }
   };

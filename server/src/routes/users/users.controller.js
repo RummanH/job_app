@@ -13,7 +13,7 @@ function sendCookie(token, res) {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
-    // secure: true,
+    secure: true,
     httpOnly: true,
   };
 
@@ -42,10 +42,11 @@ async function httpSignupUser(req, res, next) {
   }
 
   const user = await saveUser({ name, email, password, passwordConfirm });
-  const token = await user.createJWT();
 
+  const token = await user.createJWT();
   sendCookie(token, res);
 
+  user.password = undefined;
   return res.status(201).json({
     status: "success",
     token,
@@ -67,7 +68,6 @@ async function httpLoginUser(req, res, next) {
   }
 
   const token = await user.createJWT();
-
   sendCookie(token, res);
 
   user.password = undefined;
@@ -107,7 +107,7 @@ async function httpUpdateMe(req, res, next) {
 
   const updatedMe = await updateMe(req.user.id, filteredBody);
 
-  res.status(200).json({
+  return res.status(200).json({
     status: "success",
     data: {
       user: updatedMe,
@@ -115,11 +115,12 @@ async function httpUpdateMe(req, res, next) {
   });
 }
 
-async function httpUpdateUser(req, res, next) {
+async function httpGetAllUsers(req, res, next) {
+  const users = await getAllUser();
   return res.status(200).json({
     status: "success",
     data: {
-      user: "User",
+      users: users,
     },
   });
 }
@@ -137,12 +138,11 @@ async function httpGetOneUser(req, res, next) {
   });
 }
 
-async function httpGetAllUsers(req, res, next) {
-  const users = await getAllUser();
+async function httpUpdateUser(req, res, next) {
   return res.status(200).json({
     status: "success",
     data: {
-      users: users,
+      user: "User",
     },
   });
 }
